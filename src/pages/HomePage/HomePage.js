@@ -1,24 +1,41 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./HomePage.module.css";
 import ProductList from "../../components/Product/ProductList/ProductList";
 import FilterSidebar from "../../components/FilterSidebar/FilterSidebar";
-
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../config/firebase";
+import Loader from "../../components/UI/Loader/Loader";
 
 function HomePage() {
   const [query, setQuery] = useState("");
   const [priceRange, setPriceRange] = useState(75000);
-  const [categories, setCategories] = useState({
-    mensFashion: false,
-    electronics: false,
-    jewelery: false,
-    womensClothing: false,
-  });
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [tempProducts, setTempProducts] = useState([]);
+  const [fixedProducts, setFixedProducts] = useState([]);
 
   // Fetch products on app mount
+  useEffect(() => {
+    const fetchProducts = async () => {
+      let prodArr = [];
+      const querySnapshot = await getDocs(collection(db, "products"));
+      querySnapshot.docs.forEach((p, i) => {
+        prodArr.push({ id: p.id, ...p.data() });
+      });
+      setFixedProducts(prodArr);
+      setTempProducts(prodArr);
+      setLoading(false);
+    };
+
+    fetchProducts();
+  }, []);
 
   // Rerender the products if the search or filter parameters change
 
+  useEffect(() => {}, [priceRange, query, categories]);
+
   // Display loader while products are fetching using the Loader Component
+  if (loading) return <Loader />;
 
   return (
     <div className={styles.homePageContainer}>
@@ -36,10 +53,8 @@ function HomePage() {
           onChange={(e) => setQuery(e.target.value)}
         />
       </form>
-      
-      {products.length ? (
-        <ProductList />
-      ) : null}
+
+      {products.length ? <ProductList /> : null}
     </div>
   );
 }
