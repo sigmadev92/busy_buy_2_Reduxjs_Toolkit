@@ -31,12 +31,13 @@ function App() {
       if (firebaseUser) {
         // User is logged in
         const userData = await getDoc(doc(db, "users", firebaseUser.uid));
-        const { name, email, uid, createdAt } = userData.data();
+        console.log(firebaseUser.uid);
+        const { name, email, createdAt } = userData.data();
         dispatch(
           setAuthUser({
             name,
             email,
-            uid,
+            uid: firebaseUser.uid,
             createdAt: createdAt.toDate().toString(),
           })
         );

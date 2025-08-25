@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import styles from "./ProductDetails.module.css";
 import { useNavigate } from "react-router-dom";
 import MinusIcon from "../../../UI/Icons/MinusIcon";
@@ -10,6 +10,7 @@ import {
   removeFromCart,
 } from "../../../../redux/reducers/cartReducer";
 import { authSelector } from "../../../../redux/reducers/authReducer";
+import { toast } from "react-toastify";
 
 const ProductDetails = ({ title, price, productId, onCart, quantity }) => {
   const [productAddingToCart, setProductAddingToCart] = useState(false);
@@ -25,7 +26,8 @@ const ProductDetails = ({ title, price, productId, onCart, quantity }) => {
       return navigate("/signin");
     }
     setProductAddingToCart(true);
-    dispatch(addToCart(user.uid, productId));
+    dispatch(addToCart({ userId: user.uid, productId }));
+    toast.success("Product Added Successfully");
     setProductAddingToCart(false);
   };
   const removeProductBtn = async () => {

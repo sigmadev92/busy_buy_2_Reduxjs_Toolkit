@@ -26,13 +26,18 @@ const fetchCart = createAsyncThunk("cart/fetchCart", async (userId) => {
 
 const addToCart = createAsyncThunk(
   "cart/addToCart",
-  async (userId, productId) => {
+  async ({ userId, productId, addedAt = new Date().toISOString() }) => {
+    console.log(userId, productId);
     const newProd = await addDoc(collection(db, "users", userId, "cart"), {
       productId,
       quantity: 1,
-      addedAt: new Date().toISOString(),
     });
-    return newProd;
+    console.log(newProd);
+    return {
+      productId,
+      quantity: 1,
+      addedAt,
+    };
   }
 );
 
@@ -66,8 +71,12 @@ const cartSlice = createSlice({
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.cart = action.payload;
       })
+      .addCase(addToCart.rejected, (state, action) => {
+        console.log("error");
+      })
       .addCase(addToCart.fulfilled, (state, action) => {
-        state.cart.push(action.payload);
+        console.log(action.payload);
+        state.cart.push({ ...action.payload });
       })
       .addCase(removeFromCart.fulfilled, (state, action) => {
         state.cart = state.cart.filter((ele) => ele.id !== action.payload.id);

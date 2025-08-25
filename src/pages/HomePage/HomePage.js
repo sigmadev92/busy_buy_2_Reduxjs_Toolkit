@@ -24,7 +24,7 @@ function HomePage() {
       let prodArr = [];
       const querySnapshot = await getDocs(collection(db, "products"));
       querySnapshot.docs.forEach((p, i) => {
-        prodArr.push({ id: p.id, ...p.data() });
+        prodArr.push({ ...p.data() });
       });
       setFixedProducts(prodArr);
       setTempProducts(prodArr);

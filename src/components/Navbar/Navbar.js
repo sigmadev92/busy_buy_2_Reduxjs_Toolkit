@@ -11,10 +11,12 @@ import { useSelector } from "react-redux";
 import { authSelector, authActions } from "../../redux/reducers/authReducer";
 import { getAuth, signOut } from "firebase/auth";
 import { toast } from "react-toastify";
+import { cartSelector } from "../../redux/reducers/cartReducer";
 
 const Navbar = () => {
   const [click, setClick] = useState(false);
   const { loggedIn } = useSelector(authSelector);
+  const { cart } = useSelector(cartSelector);
   const { clearUser } = authActions;
   const auth = getAuth();
   const isAuthenticated = loggedIn;
@@ -92,7 +94,10 @@ const Navbar = () => {
                   </NavLink>
                 </li>
 
-                <li className="nav-item active">
+                <li
+                  className="nav-item active"
+                  style={{ position: "relative" }}
+                >
                   <NavLink
                     activeclassname="active-links"
                     to="/cart"
@@ -108,6 +113,16 @@ const Navbar = () => {
                     </span>{" "}
                     Cart
                   </NavLink>
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      right: "4.5rem",
+                      fontSize: "10px",
+                    }}
+                  >
+                    {cart.length}
+                  </span>
                 </li>
               </>
             )}
