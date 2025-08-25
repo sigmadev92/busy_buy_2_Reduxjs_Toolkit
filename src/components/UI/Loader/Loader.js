@@ -15,7 +15,7 @@ const Loader = ({ message }) => {
       }}
     >
       <GridLoader color="#7064e5" />
-      <h3>{message}</h3>
+      <h3>{message || "Please wait..."}</h3>
     </div>
   );
 };

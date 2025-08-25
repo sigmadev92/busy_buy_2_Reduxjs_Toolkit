@@ -7,7 +7,6 @@ import ProductImage from "../ProductContainer/ProductImage/ProductImage";
 const ProductCard = ({
   product: { title, price, image, id, quantity },
   onOwnPage,
-  onCart,
 }) => {
   return (
     <ProductContainer>
@@ -17,7 +16,6 @@ const ProductCard = ({
         price={price}
         onOwnPage={onOwnPage}
         productId={id}
-        onCart={onCart}
         quantity={quantity}
       />
     </ProductContainer>

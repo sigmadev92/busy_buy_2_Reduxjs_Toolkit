@@ -14,7 +14,7 @@
 
 .filterContainer {
   position: fixed;
-  left: 0;
+  left: 1rem;
   top: 30%;
   width: 14rem;
   padding: 1rem;

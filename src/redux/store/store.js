@@ -1,8 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
+import { authReducer } from "../reducers/authReducer";
+import { cartReducer } from "../reducers/cartReducer";
 // Import your reducer and use them accordingly
 // Note that you have to name the auth ,product and cart only.
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    authReducer,
+    cartReducer,
+  },
 });
 
 // Expose the store to window for debugging in development mode do not modify the below code or else the test case will not run

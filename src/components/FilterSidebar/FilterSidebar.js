@@ -2,6 +2,12 @@ import React from "react";
 import styles from "./FilterSidebar.module.css";
 
 const FilterSidebar = ({ setCategories, setPriceRange, priceRange }) => {
+  function handleChange(e) {
+    if (e.target.checked) {
+      setCategories((prev) => [...prev, e.target.value]);
+    } else
+      setCategories((prev) => prev.filter((ele) => ele !== e.target.value));
+  }
   return (
     <aside className={styles.filterContainer}>
       <h2>Filter</h2>
@@ -25,12 +31,8 @@ const FilterSidebar = ({ setCategories, setPriceRange, priceRange }) => {
               type="checkbox"
               id="mensFashion"
               name="mensFashion"
-              onChange={(e) =>
-                setCategories((prevCategories) => ({
-                  ...prevCategories,
-                  mensFashion: e.target.checked,
-                }))
-              }
+              value={"men's clothing"}
+              onChange={handleChange}
             />
             <label htmlFor="mensFashion">Men's Clothing</label>
           </div>
@@ -39,12 +41,8 @@ const FilterSidebar = ({ setCategories, setPriceRange, priceRange }) => {
               type="checkbox"
               id="womensFashion"
               name="womensFashion"
-              onChange={(e) =>
-                setCategories((prevCategories) => ({
-                  ...prevCategories,
-                  womensFashion: e.target.checked,
-                }))
-              }
+              value="women's clothing"
+              onChange={handleChange}
             />
             <label htmlFor="womensFashion">Women's Clothing</label>
           </div>
@@ -53,12 +51,8 @@ const FilterSidebar = ({ setCategories, setPriceRange, priceRange }) => {
               type="checkbox"
               id="jewelery"
               name="jewelery"
-              onChange={(e) =>
-                setCategories((prevCategories) => ({
-                  ...prevCategories,
-                  jewelery: e.target.checked,
-                }))
-              }
+              value="jewelery"
+              onChange={handleChange}
             />
             <label htmlFor="jewelery">Jewelery</label>
           </div>
@@ -67,12 +61,8 @@ const FilterSidebar = ({ setCategories, setPriceRange, priceRange }) => {
               type="checkbox"
               id="electronics"
               name="electronics"
-              onChange={(e) =>
-                setCategories((prevCategories) => ({
-                  ...prevCategories,
-                  electronics: e.target.checked,
-                }))
-              }
+              value={"electronics"}
+              onChange={handleChange}
             />
             <label htmlFor="electronics">Electronics</label>
           </div>

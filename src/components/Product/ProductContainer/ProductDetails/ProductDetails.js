@@ -3,28 +3,44 @@ import styles from "./ProductDetails.module.css";
 import { useNavigate } from "react-router-dom";
 import MinusIcon from "../../../UI/Icons/MinusIcon";
 import PlusIcon from "../../../UI/Icons/PlusIcon";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addToCart,
+  cartSelector,
+  removeFromCart,
+} from "../../../../redux/reducers/cartReducer";
+import { authSelector } from "../../../../redux/reducers/authReducer";
 
 const ProductDetails = ({ title, price, productId, onCart, quantity }) => {
   const [productAddingToCart, setProductAddingToCart] = useState(false);
   const [productRemovingFromCart, setProductRemovingCart] = useState(false);
-
+  const { user, loggedIn } = useSelector(authSelector);
+  const { cart } = useSelector(cartSelector);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-
-  const addProductToCart = async () => {
-      // Function to add product to cart
+  const addProductToCartBtn = async () => {
+    // Function to add product to cart
+    if (!loggedIn) {
+      return navigate("/signin");
+    }
+    setProductAddingToCart(true);
+    dispatch(addToCart(user.uid, productId));
+    setProductAddingToCart(false);
   };
-  const removeProduct = async () => {
+  const removeProductBtn = async () => {
     // Function to remaove the cart
+    setProductRemovingCart(true);
+    const cartItemId = cart.find((ele) => ele.productId === productId).id;
+    dispatch(removeFromCart(user.uid, cartItemId));
   };
 
-
-  const handleAdd = async () => {
-  // Function for Handling the product quantity increase
+  const handleAddBtn = async () => {
+    // Function for Handling the product quantity increase
   };
 
-  const handleRemove = async () => {
-  // Handling the product quantity decrease
+  const handleRemoveBtn = async () => {
+    // Handling the product quantity decrease
   };
 
   return (
@@ -36,9 +52,9 @@ const ProductDetails = ({ title, price, productId, onCart, quantity }) => {
         <p>₹ {price}</p>
         {onCart && (
           <div className={styles.quantityContainer}>
-            <MinusIcon handleRemove={handleRemove} />
+            <MinusIcon handleRemove={handleRemoveBtn} />
             {quantity}
-            <PlusIcon handleAdd={handleAdd} />
+            <PlusIcon handleAdd={handleAddBtn} />
           </div>
         )}
       </div>
@@ -48,7 +64,7 @@ const ProductDetails = ({ title, price, productId, onCart, quantity }) => {
           className={styles.addBtn}
           title="Add to Cart"
           disabled={productAddingToCart}
-          onClick={addProductToCart}
+          onClick={addProductToCartBtn}
         >
           {productAddingToCart ? "Adding" : "Add To Cart"}
         </button>
@@ -56,7 +72,7 @@ const ProductDetails = ({ title, price, productId, onCart, quantity }) => {
         <button
           className={styles.removeBtn}
           title="Remove from Cart"
-          onClick={removeProduct}
+          onClick={removeProductBtn}
         >
           {productRemovingFromCart ? "Removing" : "Remove From Cart"}
         </button>

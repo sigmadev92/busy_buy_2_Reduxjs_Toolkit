@@ -1,20 +1,28 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import styles from "./LoginPage.module.css";
-import { NavLink } from "react-router-dom";
+import { Navigate, NavLink } from "react-router-dom";
+import Loader from "../../components/UI/Loader/Loader";
+import { useSelector } from "react-redux";
+import { authSelector } from "../../redux/reducers/authReducer";
 
 const LoginPage = () => {
-
+  const { loggedIn } = useSelector(authSelector);
   const emailRef = useRef();
   const passwordRef = useRef();
 
-    // If user is authenticated redirect him to home page
+  const [loading, setLoading] = useState(false);
 
-    // If some error occurs display the error
+  // If user is authenticated redirect him to home page
+  if (loggedIn) {
+    return <Navigate to={"/"} />;
+  }
 
+  // If some error occurs display the error
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const emailVal = emailRef.current.value;
     const passwordVal = passwordRef.current.value;
 
@@ -22,8 +30,11 @@ const LoginPage = () => {
     if (emailVal === "" || passwordVal === "" || passwordVal.length < 6) {
       return toast.error("Please enter valid data!");
     }
+    setLoading(false);
     // write function here to login the user using redux
   };
+
+  if (loading) return <Loader message={"Loading"} />;
 
   return (
     <div className={styles.formContainer}>

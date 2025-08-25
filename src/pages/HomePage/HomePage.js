@@ -14,6 +14,10 @@ function HomePage() {
   const [tempProducts, setTempProducts] = useState([]);
   const [fixedProducts, setFixedProducts] = useState([]);
 
+  const style = {
+    marginLeft: "16rem",
+  };
+
   // Fetch products on app mount
   useEffect(() => {
     const fetchProducts = async () => {
@@ -32,7 +36,21 @@ function HomePage() {
 
   // Rerender the products if the search or filter parameters change
 
-  useEffect(() => {}, [priceRange, query, categories]);
+  useEffect(() => {
+    let np = fixedProducts.filter((p) => p.price <= priceRange);
+    if (query) {
+      np = np.filter((p) => new RegExp(query, "i").test(p.title));
+    }
+
+    const filteredProducts =
+      categories.length === 0
+        ? np
+        : np.filter((p) => categories.includes(p.category));
+
+    setTempProducts(filteredProducts);
+
+    //eslint-disable-next-line
+  }, [priceRange, query, categories]);
 
   // Display loader while products are fetching using the Loader Component
   if (loading) return <Loader />;
@@ -54,7 +72,9 @@ function HomePage() {
         />
       </form>
 
-      {products.length ? <ProductList /> : null}
+      {tempProducts.length ? (
+        <ProductList style={style} products={tempProducts} />
+      ) : null}
     </div>
   );
 }

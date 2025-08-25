@@ -6,7 +6,7 @@ const ProductImage = ({ image }) => {
   return (
     <div className={styles.imageContainer}>
       <img
-        src={image}
+        src={""}
         alt="Product"
         width="100%"
         height="100%"
