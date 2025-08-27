@@ -1,13 +1,11 @@
 import React from "react";
 import styles from "./OrderTable.module.css";
-import { convertDate } from "../../utils/utils";
 
 // Component to display user order in table format
-const OrderTable = ({ order }) => {
-  if (!order.length) return;
+const OrderTable = ({ order, orderedOn }) => {
   return (
     <div style={{ textAlign: "center", marginTop: "2rem" }}>
-      {order[0]?.date && <h2>Ordered On:- {convertDate(order[0].date)}</h2>}
+      <h2>Ordered On:- {orderedOn}</h2>
       <table className={styles.table}>
         <thead>
           <tr>
@@ -30,14 +28,16 @@ const OrderTable = ({ order }) => {
           })}
           <tr></tr>
         </tbody>
-        <tr className={styles.totalPrice}>
-          <td>
-            {/* Display total price of products for that particular order */}
-            {`₹ ${order.reduce((acc, currentProduct) => {
-              return acc + currentProduct.price * currentProduct.quantity;
-            }, 0)}`}
-          </td>
-        </tr>
+        <tfoot>
+          <tr className={styles.totalPrice}>
+            <td>
+              {/* Display total price of products for that particular order */}
+              {`₹ ${order.reduce((acc, currentProduct) => {
+                return acc + currentProduct.price * currentProduct.quantity;
+              }, 0)}`}
+            </td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   );

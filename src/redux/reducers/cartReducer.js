@@ -14,13 +14,22 @@ const initialState = {
   cart: [],
 };
 
+/*
+  cartItem = {
+    cartItemId,
+    productId,
+    quantity,
+    addedAt:
+  }
+*/
+
 const fetchCart = createAsyncThunk("cart/fetchCart", async (userId) => {
   let tempArr = [];
   const querySnapshot = await getDocs(collection(db, "users", userId, "cart"));
   querySnapshot.docs.forEach((item) => {
-    tempArr.push(item);
+    tempArr.push({ ...item.data(), cartItemId: item.id });
   });
-
+  console.log(tempArr);
   return tempArr;
 });
 
@@ -28,25 +37,27 @@ const addToCart = createAsyncThunk(
   "cart/addToCart",
   async ({ userId, productId, addedAt = new Date().toISOString() }) => {
     console.log(userId, productId);
-    const newProd = await addDoc(collection(db, "users", userId, "cart"), {
+    const ref = await addDoc(collection(db, "users", userId, "cart"), {
       productId,
       quantity: 1,
     });
-    console.log(newProd);
+
     return {
       productId,
       quantity: 1,
       addedAt,
+      cartItemId: ref.id,
     };
   }
 );
 
 const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
-  async (userId, cartItemId) => {
+  async ({ userId, cartItemId, index }) => {
+    console.log(userId, cartItemId);
     try {
       await deleteDoc(doc(db, "users", userId, "cart", cartItemId));
-      return { success: true, id: cartItemId };
+      return { success: true, index };
     } catch (error) {
       return { success: false };
     }
@@ -54,18 +65,23 @@ const removeFromCart = createAsyncThunk(
 );
 const changeQty = createAsyncThunk(
   "cart/increaseQty",
-  async (userId, cartItem, index, qty) => {
-    await setDoc(doc(db, "users", userId, "cart", cartItem), {
-      quantity: cartItem.quantity + qty,
+  async ({ userId, index, cartItem, qty }) => {
+    const { cartItemId, quantity } = cartItem;
+    await setDoc(doc(db, "users", userId, "cart", cartItemId), {
+      quantity: quantity + qty,
     });
-    return { qty, index };
+    return { qty, index, quantity };
   }
 );
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
-  reducers: {},
+  reducers: {
+    emptyCart: (state, _) => {
+      state.cart = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCart.fulfilled, (state, action) => {
@@ -79,11 +95,12 @@ const cartSlice = createSlice({
         state.cart.push({ ...action.payload });
       })
       .addCase(removeFromCart.fulfilled, (state, action) => {
-        state.cart = state.cart.filter((ele) => ele.id !== action.payload.id);
+        console.log(action.payload);
+        state.cart.splice(action.payload.index, 1);
       })
       .addCase(changeQty.fulfilled, (state, action) => {
-        const { qty, index } = action.payload;
-        state.cart[index].quantity += qty;
+        const { qty, index, quantity } = action.payload;
+        state.cart[index].quantity = quantity + qty;
       });
   },
 });
@@ -92,7 +109,7 @@ const cartReducer = cartSlice.reducer;
 
 const cartActions = cartSlice.actions;
 
-const cartSelector = (state) => state.cartReducer;
+const cartSelector = (state) => state.cart;
 
 export {
   cartActions,
@@ -101,4 +118,5 @@ export {
   fetchCart,
   addToCart,
   removeFromCart,
+  changeQty,
 };

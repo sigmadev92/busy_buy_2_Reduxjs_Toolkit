@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import styles from "./HomePage.module.css";
 import ProductList from "../../components/Product/ProductList/ProductList";
 import FilterSidebar from "../../components/FilterSidebar/FilterSidebar";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../config/firebase";
 import Loader from "../../components/UI/Loader/Loader";
+import { useSelector } from "react-redux";
+import { productsSelector } from "../../redux/reducers/productsReducer";
 
 function HomePage() {
   const [query, setQuery] = useState("");
@@ -12,32 +12,23 @@ function HomePage() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tempProducts, setTempProducts] = useState([]);
-  const [fixedProducts, setFixedProducts] = useState([]);
-
+  const { products } = useSelector(productsSelector);
   const style = {
     marginLeft: "16rem",
   };
 
   // Fetch products on app mount
   useEffect(() => {
-    const fetchProducts = async () => {
-      let prodArr = [];
-      const querySnapshot = await getDocs(collection(db, "products"));
-      querySnapshot.docs.forEach((p, i) => {
-        prodArr.push({ ...p.data() });
-      });
-      setFixedProducts(prodArr);
-      setTempProducts(prodArr);
-      setLoading(false);
-    };
-
-    fetchProducts();
-  }, []);
+    setLoading(true);
+    setTempProducts(products);
+    setLoading(false);
+    //eslint-disable-next-line
+  }, [products]);
 
   // Rerender the products if the search or filter parameters change
 
   useEffect(() => {
-    let np = fixedProducts.filter((p) => p.price <= priceRange);
+    let np = products.filter((p) => p.price <= priceRange);
     if (query) {
       np = np.filter((p) => new RegExp(query, "i").test(p.title));
     }
@@ -73,8 +64,10 @@ function HomePage() {
       </form>
 
       {tempProducts.length ? (
-        <ProductList style={style} products={tempProducts} />
-      ) : null}
+        <ProductList style={style} products={tempProducts} onCart={false} />
+      ) : (
+        <>No products</>
+      )}
     </div>
   );
 }

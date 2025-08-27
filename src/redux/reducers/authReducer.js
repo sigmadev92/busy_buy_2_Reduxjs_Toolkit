@@ -26,6 +26,6 @@ const authReducer = authSlice.reducer;
 
 const authActions = authSlice.actions;
 
-const authSelector = (state) => state.authReducer;
+const authSelector = (state) => state.auth;
 
 export { authActions, authReducer, authSelector };

@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import "./Navbar.css";
 //Icons..
@@ -14,16 +13,11 @@ import { toast } from "react-toastify";
 import { cartSelector } from "../../redux/reducers/cartReducer";
 
 const Navbar = () => {
-  const [click, setClick] = useState(false);
   const { loggedIn } = useSelector(authSelector);
   const { cart } = useSelector(cartSelector);
   const { clearUser } = authActions;
   const auth = getAuth();
   const isAuthenticated = loggedIn;
-  const scrollTop = () => {
-    setClick(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   // Function to logout from app
 
@@ -51,10 +45,7 @@ const Navbar = () => {
           <NavLink to="/" className="navbar-logo">
             Busy Buy
           </NavLink>
-          <ul
-            className={click ? "nav-menu active" : "nav-menu"}
-            onClick={scrollTop}
-          >
+          <ul className={"nav-menu"}>
             <li className="nav-item active">
               <NavLink
                 activeclassname="active-links"
@@ -63,12 +54,7 @@ const Navbar = () => {
                 exact="true"
               >
                 <span>
-                  <img
-                    className="icon_styles"
-                    src={HomeIcon}
-                    alt="Home"
-                    onClick={scrollTop}
-                  />
+                  <img className="icon_styles" src={HomeIcon} alt="Home" />
                 </span>{" "}
                 Home
               </NavLink>
@@ -87,7 +73,6 @@ const Navbar = () => {
                         className="icon_styles"
                         src={OrdersIcon}
                         alt="Home"
-                        onClick={scrollTop}
                       />
                     </span>{" "}
                     My orders
@@ -104,12 +89,7 @@ const Navbar = () => {
                     className="nav-links"
                   >
                     <span>
-                      <img
-                        className="icon_styles"
-                        src={Cart}
-                        alt="Home"
-                        onClick={scrollTop}
-                      />
+                      <img className="icon_styles" src={Cart} alt="Home" />
                     </span>{" "}
                     Cart
                   </NavLink>
@@ -148,12 +128,7 @@ const Navbar = () => {
                     className="nav-links"
                   >
                     <span>
-                      <img
-                        className="icon_styles"
-                        src={SignIn}
-                        alt="Home"
-                        onClick={scrollTop}
-                      />
+                      <img className="icon_styles" src={SignIn} alt="gate" />
                     </span>
                     SignIn
                   </NavLink>

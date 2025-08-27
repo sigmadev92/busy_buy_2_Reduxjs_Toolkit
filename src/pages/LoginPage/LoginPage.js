@@ -1,24 +1,23 @@
 import React, { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import styles from "./LoginPage.module.css";
-import { Navigate, NavLink } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import Loader from "../../components/UI/Loader/Loader";
-import { useSelector } from "react-redux";
-import { authSelector } from "../../redux/reducers/authReducer";
+import { useDispatch, useSelector } from "react-redux";
+import { authActions, authSelector } from "../../redux/reducers/authReducer";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "../../config/firebase";
 
 const LoginPage = () => {
-  const { loggedIn } = useSelector(authSelector);
   const emailRef = useRef();
   const passwordRef = useRef();
-
+  const { loggedIn } = useSelector(authSelector);
+  const auth = getAuth();
   const [loading, setLoading] = useState(false);
-
-  // If user is authenticated redirect him to home page
-  if (loggedIn) {
-    return <Navigate to={"/"} />;
-  }
-
-  // If some error occurs display the error
+  const { setAuthUser } = authActions;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -30,10 +29,30 @@ const LoginPage = () => {
     if (emailVal === "" || passwordVal === "" || passwordVal.length < 6) {
       return toast.error("Please enter valid data!");
     }
+    try {
+      const userCredentials = await signInWithEmailAndPassword(
+        auth,
+        emailVal,
+        passwordVal
+      );
+      const userInfo = userCredentials.user;
+
+      const userData = await getDoc(doc(db, "users", userInfo.uid));
+      toast.success("Logged In successfully");
+
+      dispatch(setAuthUser({ ...userData.data(), createdAt: "" }));
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      toast.error("Registration failed" + error.message);
+    }
+
     setLoading(false);
     // write function here to login the user using redux
   };
-
+  if (loggedIn) {
+    return <Navigate to={"/"} />;
+  }
   if (loading) return <Loader message={"Loading"} />;
 
   return (
@@ -57,16 +76,13 @@ const LoginPage = () => {
         <button className={styles.loginBtn}>
           {loading ? "..." : "Sign In"}
         </button>
-        <NavLink
-          to="/signup"
-          style={{
-            textDecoration: "none",
-            color: "#224957",
-            fontFamily: "Quicksand",
-          }}
+
+        <p
+          style={{ fontWeight: "600", margin: 0, cursor: "pointer" }}
+          onClick={() => navigate("/signup")}
         >
-          <p style={{ fontWeight: "600", margin: 0 }}>Or SignUp instead</p>
-        </NavLink>
+          Or SignUp instead
+        </p>
       </form>
     </div>
   );

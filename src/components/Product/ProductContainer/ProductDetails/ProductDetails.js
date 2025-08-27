@@ -6,8 +6,9 @@ import PlusIcon from "../../../UI/Icons/PlusIcon";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToCart,
-  cartSelector,
   removeFromCart,
+  changeQty,
+  cartSelector,
 } from "../../../../redux/reducers/cartReducer";
 import { authSelector } from "../../../../redux/reducers/authReducer";
 import { toast } from "react-toastify";
@@ -23,8 +24,18 @@ const ProductDetails = ({ title, price, productId, onCart, quantity }) => {
   const addProductToCartBtn = async () => {
     // Function to add product to cart
     if (!loggedIn) {
-      return navigate("/signin");
+      navigate("/signin");
+      return;
     }
+    const idx = cart.findIndex((ele) => ele.productId === productId);
+    if (idx >= 0) {
+      dispatch(
+        changeQty({ userId: user.uid, index: idx, cartItem: cart[idx], qty: 1 })
+      );
+      toast.success("Increase count successfully");
+      return;
+    }
+
     setProductAddingToCart(true);
     dispatch(addToCart({ userId: user.uid, productId }));
     toast.success("Product Added Successfully");
@@ -33,16 +44,47 @@ const ProductDetails = ({ title, price, productId, onCart, quantity }) => {
   const removeProductBtn = async () => {
     // Function to remaove the cart
     setProductRemovingCart(true);
-    const cartItemId = cart.find((ele) => ele.productId === productId).id;
-    dispatch(removeFromCart(user.uid, cartItemId));
+    const idx = cart.findIndex((ele) => ele.productId === productId);
+    if (idx === -1) {
+      setProductRemovingCart(false);
+      return toast.error("Something went wrong");
+    }
+    dispatch(
+      removeFromCart({
+        userId: user.uid,
+        cartItemId: cart[idx].cartItemId,
+        index: idx,
+      })
+    );
+    toast.success("Product Removed Successfully");
+    setProductRemovingCart(false);
   };
 
   const handleAddBtn = async () => {
     // Function for Handling the product quantity increase
+    const idx = cart.findIndex((ele) => ele.productId === productId);
+    dispatch(
+      changeQty({ userId: user.uid, index: idx, cartItem: cart[idx], qty: 1 })
+    );
   };
 
   const handleRemoveBtn = async () => {
     // Handling the product quantity decrease
+    const idx = cart.findIndex((ele) => ele.productId === productId);
+    const cartItem = cart[idx];
+    if (cartItem.quantity === 1) {
+      dispatch(
+        removeFromCart({
+          userId: user.uid,
+          cartItemId: cart[idx].cartItemId,
+          index: idx,
+        })
+      );
+      return;
+    }
+    dispatch(
+      changeQty({ userId: user.uid, index: idx, cartItem: cart[idx], qty: -1 })
+    );
   };
 
   return (
